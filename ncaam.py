@@ -1,4 +1,3 @@
-import urllib2
 from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
