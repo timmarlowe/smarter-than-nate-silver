@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
     #Clean up datafram
     cleandf = clean_game_data(df)
-    cleandf.to_pickle('data/initial_clean_df.pkl')
+    #cleandf.to_pickle('data/initial_clean_df.pkl')
     #cleandf=pd.read_pickle('data/initial_clean_df.pkl')
 
     #Create matchup dataframe, game_outcomedf (with one row per team in matchup and point spread), and games_final (with one row per game and point spread)

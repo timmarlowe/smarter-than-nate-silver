@@ -1,0 +1,24 @@
+What to calculate
+
+#Shooting (for both home and away team)
+FG%
+FT%
+3P%
+EFG% (one of four factors) ((FG + 0.5 * 3P) / FGA)
+
+#Record
+W% overall (for both home and away team)
+Average points spread overall (for both home and away team)
+Opp ppg (for both home and away team)
+W% home (for home team)
+W% away (for away team)
+Av points spread home (for home team - drop away for home team)
+Av points spread away (for away team - drop home for away team)
+Home point spread var (for home team)
+Away point spread var (for away team - drop away for home team and home for away team)
+
+#Others (for both home and away team)
+Turnover percentage (from four factors) (TOV / (FGA + 0.44 * FTA + TOV))
+Free throw factor (from four factors) (FT/FGA)
+Avg possessions (pace) - (FGA - ORB + TOV)
+W_Pyth
