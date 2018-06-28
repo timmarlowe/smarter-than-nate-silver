@@ -46,7 +46,7 @@ def record(df):
     df['awayteam_wp'] = df['awayteam_wins']/df['awayteam_games']
     df['awayteam_awaywp'] = 1-(df['away_losses_away']/df['away_games_away'])
     #dropping unneeded columns
-    df.drop(['hometeam_wins','home_wins_home','away_losses_home','awayteam_wins','home_wins_away','away_losses_away'], axis = 1,inplace=True)
+    df.drop(['home_wins_home','away_losses_home','home_wins_away','away_losses_away'], axis = 1,inplace=True)
     return df
 
 def point_spread(df):
@@ -61,12 +61,13 @@ def point_spread(df):
     df['awayteam_pt_sprd'] = ((df['home_games_away'] * df['home_ps_away'])+(df['away_games_away'] * df['away_ps_away']))/df['awayteam_games']
     df['awayteam_opp_ppg'] = df['away_ppg'] - df['awayteam_pt_sprd']
     #Pythagorean expected wins
-    df['pyth_wp_home'] = (df['home_ppg']**14)/((df['home_ppg']**14)+(df['hometeam_opp_ppg']**14))
-    df['pyth_wp_away'] = (df['away_ppg']**14)/((df['away_ppg']**14)+(df['awayteam_opp_ppg']**14))
+    df['pyth_wd_home'] = df['hometeam_wins'] - df['hometeam_games'] * (df['home_ppg']**14)/((df['home_ppg']**14)+(df['hometeam_opp_ppg']**14))
+    df['pyth_wd_away'] = df['awayteam_wins'] - df['awayteam_games'] * (df['away_ppg']**14)/((df['away_ppg']**14)+(df['awayteam_opp_ppg']**14))
+
     #Point Spread Variance
     df['hometeam_ps_var'] = ((df['hometeam_games']-1)*(df['home_ps_var_home']+df['away_ps_var_home'])+((df['hometeam_games']/2)*((df['home_ps_home']-df['away_ps_home'])**2)))/(2*df['hometeam_games']-1)
     df['awayteam_ps_var'] = ((df['awayteam_games']-1)*(df['home_ps_var_away']+df['away_ps_var_away'])+((df['awayteam_games']/2)*((df['home_ps_away']-df['away_ps_away'])**2)))/(2*df['awayteam_games']-1)
-    df.drop(['home_ps_var_home', 'away_games_home', 'away_ps_home','away_ps_var_home', 'home_games_away', 'home_ps_away','home_ps_var_away', 'away_games_away','away_ps_var_away','home_games_home'],axis=1, inplace=True)
+    df.drop(['hometeam_games', 'hometeam_wins','awayteam_games','awayteam_wins','home_ps_var_home', 'away_games_home', 'away_ps_home','away_ps_var_home', 'home_games_away', 'home_ps_away','home_ps_var_away', 'away_games_away','away_ps_var_away','home_games_home'],axis=1, inplace=True)
     return df
 
 def misc_features(df):
@@ -108,8 +109,8 @@ def split_seasons(df):
     df['madness_date'] = df['year'].map(TourneyDates)
     df_reg = df[df['DATE_STRING'] < df['madness_date']].reset_index()
     df_tourney = df[df['DATE_STRING'] >= df['madness_date']].reset_index()
-    df_reg.drop(['level_0','index','madness_date','DATE_STRING'],axis=1, inplace=True)
-    df_tourney.drop(['level_0','index','madness_date','DATE_STRING'],axis=1, inplace=True)
+    df_reg.drop(['level_0','index','madness_date','DATE_STRING','DATE','Home','Away','month','home_trebpg','away_trebpg','home_topg','away_topg'],axis=1, inplace=True)
+    df_tourney.drop(['level_0','index','madness_date','DATE_STRING','month','home_trebpg','away_trebpg','home_topg','away_topg'],axis=1, inplace=True)
     return df_reg, df_tourney
 
 if __name__ == "__main__":

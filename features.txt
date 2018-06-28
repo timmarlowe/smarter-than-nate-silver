@@ -22,3 +22,10 @@ Turnover percentage (from four factors) (TOV / (FGA + 0.44 * FTA + TOV))
 Free throw factor (from four factors) (FT/FGA)
 Avg possessions (pace) - (FGA - ORB + TOV)
 W_Pyth
+
+
+
+Features to remove:
+exogs1: ['home_ppg','home_fgapg','home_ftapg','home_ftpct','home_fgp_var','home_ppg_var','away_ftapg','away_ppg_var','away_3ppct','away_ftpct','awayteam_awaywp','hometeam_opp_ppg','pyth_wd_away','awayteam_ps_var','home_pace','away_pace']
+exogs2: ['home_drebpg','home_fgpct','away_fgpct','home_3ppct','awayteam_opp_ppg']
+exogs3: ['home_foulpg','home_3papg','away_3papg','home_stlpg']
