@@ -128,8 +128,6 @@ def get_record(row):
     df_all = pd.concat([home_wins_home,home_games_home,home_ps_home,home_ps_var_home,away_losses_home,away_games_home,away_ps_home,away_ps_var_home,home_wins_away,home_games_away,home_ps_away,home_ps_var_away,away_losses_away,away_games_away,away_ps_away,away_ps_var_away])
     return df_all
 
-# def ind_players(df):
-#     playerdf =
 
 if __name__ == "__main__":
     #Read in data
@@ -146,11 +144,11 @@ if __name__ == "__main__":
     game_outcomedf.to_pickle('data/games.pkl')
     games_finaldf = games_finaldb(game_outcomedf)
     #games_finaldf.to_pickle('data/games_final.pkl')
-    games_final = pd.read_pickle('data/games_final.pkl')
+    games_finaldf = pd.read_pickle('data/games_final.pkl')
     #game_stats = pd.read_pickle('data/games.pkl')
 
     #creating set of games for predicting (removing first two months - November (11) and December (12) as not enough season history)
-    games_test = games_final[(games_final['month']<4)]
+    games_test = games_finaldf[(games_finaldf['month']<4)]
 
     #Pulling team stats up until game in games_test dataframe
     df_allstats = games_test.apply(get_season_stats,axis=1)

@@ -61,8 +61,8 @@ def point_spread(df):
     df['awayteam_pt_sprd'] = ((df['home_games_away'] * df['home_ps_away'])+(df['away_games_away'] * df['away_ps_away']))/df['awayteam_games']
     df['awayteam_opp_ppg'] = df['away_ppg'] - df['awayteam_pt_sprd']
     #Pythagorean expected wins
-    df['pyth_wd_home'] = df['hometeam_wins'] - df['hometeam_games'] * (df['home_ppg']**14)/((df['home_ppg']**14)+(df['hometeam_opp_ppg']**14))
-    df['pyth_wd_away'] = df['awayteam_wins'] - df['awayteam_games'] * (df['away_ppg']**14)/((df['away_ppg']**14)+(df['awayteam_opp_ppg']**14))
+    df['home_pyth_wd'] = df['hometeam_wins'] - df['hometeam_games'] * (df['home_ppg']**14)/((df['home_ppg']**14)+(df['hometeam_opp_ppg']**14))
+    df['away_pyth_wd'] = df['awayteam_wins'] - df['awayteam_games'] * (df['away_ppg']**14)/((df['away_ppg']**14)+(df['awayteam_opp_ppg']**14))
 
     #Point Spread Variance
     df['hometeam_ps_var'] = ((df['hometeam_games']-1)*(df['home_ps_var_home']+df['away_ps_var_home'])+((df['hometeam_games']/2)*((df['home_ps_home']-df['away_ps_home'])**2)))/(2*df['hometeam_games']-1)
@@ -83,8 +83,33 @@ def misc_features(df):
     #Pace - avg possessions per game
     df['home_pace'] =  df['home_fgapg'] - df['home_orebpg'] + df['home_topg']
     df['away_pace'] =  df['away_fgapg'] - df['away_orebpg'] + df['away_topg']
-    df.drop(['home_ftmpg','away_ftmpg'],axis=1, inplace=True)
+    df.drop(['home_ftmpg','away_ftmpg','home_trebpg','away_trebpg','home_topg','away_topg'],axis=1, inplace=True)
     return df
+
+def home_minus_away(df,varlst):
+    ''' Input: Dataframe with home and away stats
+        Output: Dataframe with home stats minus away stats
+        '''
+    df2 = df.copy()
+    for var in varlst:
+        df2['diff{}'.format(var)] = df['home{}'.format(var)] - df['away{}'.format(var)]
+        df2.drop(['home{}'.format(var),'away{}'.format(var)], axis=1, inplace=True)
+    return df2
+
+def per_possession(df,varlist):
+    df3 = df.copy()
+    for var in varlist:
+        for ha in ['home_','away_']:
+            df3['{0}{1}_perposs'.format(ha,var)] = df['{0}{1}pg'.format(ha,var)]/df['{}pace'.format(ha)]
+            df3.drop(['{0}{1}pg'.format(ha,var)], axis=1, inplace=True)
+    df3.drop(['home_pace','away_pace'], axis=1,inplace=True)
+    return df3
+
+def polynomial(df):
+    df['hpsq'] = df['hometeam_pt_sprd']**2
+    df['apsq'] = df['awayteam_pt_sprd']**2
+    return df
+
 
 def split_seasons(df):
     '''
@@ -92,7 +117,7 @@ def split_seasons(df):
     OUTPUT: 2 dataframes split between regular season and March Madness games.
     =========================================================================
     This will be our train/test split for each season
-    Thank you to Steve Iannaccone for this piece of code
+    Thank you to Steve Iannaccone for this dictionary - and some of the code
         '''
     TourneyDates = {2007: '2007-03-11',
                     2008: '2008-03-18',
@@ -109,11 +134,12 @@ def split_seasons(df):
     df['madness_date'] = df['year'].map(TourneyDates)
     df_reg = df[df['DATE_STRING'] < df['madness_date']].reset_index()
     df_tourney = df[df['DATE_STRING'] >= df['madness_date']].reset_index()
-    df_reg.drop(['level_0','index','madness_date','DATE_STRING','DATE','Home','Away','month','home_trebpg','away_trebpg','home_topg','away_topg'],axis=1, inplace=True)
-    df_tourney.drop(['level_0','index','madness_date','DATE_STRING','month','home_trebpg','away_trebpg','home_topg','away_topg'],axis=1, inplace=True)
+    df_reg.drop(['level_0','index','madness_date','DATE_STRING','DATE','Home','Away','month'],axis=1, inplace=True)
+    df_tourney.drop(['level_0','index','madness_date','DATE_STRING','month'],axis=1, inplace=True)
     return df_reg, df_tourney
 
 if __name__ == "__main__":
+    #Feature engineering
     df = pd.read_pickle('data/modeling_db1.pkl')
     df = name_cleanup(df)
     df = shooting(df)
@@ -122,6 +148,24 @@ if __name__ == "__main__":
     df = misc_features(df)
     df.dropna(inplace=True)
     df.to_pickle('data/modeling_whole.pkl')
-    df_reg, df_tourney = split_seasons(df)
-    df_reg.to_pickle('data/reg_model_data_final.pkl')
-    df_tourney.to_pickle('data/tourney_model_data_final.pkl')
+
+    #creating train-test split on regular data
+    df_reg1, df_tourney1 = split_seasons(df)
+    df_reg1.to_pickle('data/reg_model_data_final1.pkl')
+    df_tourney1.to_pickle('data/tourney_model_data_final1.pkl')
+
+    #creating train-test split on home-minus away database
+    varlist = ['_bpg','_drebpg','_orebpg','_foulpg','_ppg','_stlpg','_3papg','_fgapg','_ftapg','_apg','_fgp_var','_ppg_var','_fgpct','_3ppct','_ftpct','_efgpct','team_wp','team_pt_sprd','team_opp_ppg','team_ps_var','_tovpct','_ft_factor','_pace','_pyth_wd']
+    df2 = home_minus_away(df, varlist)
+    df2.to_pickle('data/modeling_homeaway.pkl')
+    df_reg2, df_tourney2 = split_seasons(df2)
+    df_reg2.to_pickle('data/reg_model_data_final_homeaway.pkl')
+    df_tourney2.to_pickle('data/tourney_model_data_final_homeaway.pkl')
+
+    #Creating more advanced stats in 3rd df
+    varlist2 = ['dreb','oreb','foul','p','stl','3pa', 'fga', 'fta', 'a', 'b']
+    df3 = per_possession(df,varlist2)
+    df3 = polynomial(df3)
+    df_reg3, df_tourney3 = split_seasons(df3)
+    df_reg3.to_pickle('data/reg_model_data_final3.pkl')
+    df_tourney3.to_pickle('data/tourney_model_data_final3.pkl')
