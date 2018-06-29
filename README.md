@@ -14,6 +14,7 @@ Building models to predict the NCAA tournament is often done by using advanced m
 My question was whether I could build a predictor off of a data set that used none of the aggregated metrics to predict point spread and thus outcomes of final four games. Given that there are over 3000 games a season, if a true signal could be found just in the box scores of individual matchups and the aggregation of team stats for each matchup up to that point in the season, it may be a more powerful and specific predictor than a team's advanced stats at the end of the season going into March Madness.
 
 ## Data Source
+#### Aggregation Methods
 Following Steve's lead, I used data from individual game box scores from the website http://sportsdata.wfmz.com. I aggregated 11 years of this data (from the 2006-2007 season to the 2017-2018 season). In order to do this, I used Steve Iacconne's [scrapey.py](https://github.com/timmarlowe/smarter-than-nate-silver/edit/master/src/scrapey.py) code. With the exception of a dictionary with the dates of the start of March Madness, this was the only code of his I used).
 
 Upon compiling the data, I was left with a data set of 1.3 million rows, in which each row was a player's individual stat-line in a game. I aggregated up to the matchup and then game level using groupby. Then given that I wanted to predict on record up to a certain game, the task was to aggregate the stats of each team up to that game. In the example below, in order to predict Louisville's outcome agains VA Tech, I needed their team stats up until VA Tech.
@@ -43,45 +44,54 @@ df_allstats = games_test.apply(get_season_stats,axis=1)
 
 Next, I attached win-loss record and average point spread up to that point in the season through a similar process.
 
+#### Feature Creation
 I cleaned up the data and added advanced stats such as [Turnover Percent, Free Throw Factor and Effective Field Goal Percentage](https://www.basketball-reference.com/about/glossary.html) using [feature_eng.py](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/src/feature_eng.py).
 
-__Turnover percent__:
+___Turnover percent___:
 ```python
 df['home_tovpct'] = df['home_topg']/(df['home_fgapg'] + 0.44 * df['home_ftapg'] + df['home_topg'])
 ```
-__Free Throw Factor__:
+___Free Throw Factor___:
 ```python
 df['home_ft_factor'] = df['home_ftmpg']/df['home_fgapg']
 ```
-__Effective Field Goal Percent__:
+___Effective Field Goal Percent___:
 ```python
 df['home_efgpct'] = (df['home_fgmpg']+.5*df['home_3pmpg'])/df['home_fgapg']
 ```
-I also included an amateur calculation of __number of possessions__ in a game as a pace metric:
+I also included an amateur calculation of ___number of possessions___ in a game as a pace metric:
 ```python
 df['home_pace'] =  df['home_fgapg'] - df['home_orebpg'] + df['home_topg']
 ```
-And a calculation of the __pythagorean expectation__ for difference between games won and expected games won each team:
+And a calculation of the ___pythagorean expectation___ for difference between games won and expected games won each team:
 ```python
 df['home_pyth_wd'] = df['hometeam_wins'] - df['hometeam_games'] * (df['home_ppg']**14)/((df['home_ppg']**14)+(df['hometeam_opp_ppg']**14))
 ```
 
 Unfortunately, because of the method of aggregation and lack of data from the box scores, I was not able to calculate most defensive statistics.
 
+#### Dataframes and Train-Test Split
 As a last step prior to train-test-split, I created three dataframes, each one with its own approach to the data.
 
-[DF1](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/data/reg_model_data_final1.pkl) contains multiple fields for home teams and those same fields for away teams. It has the most fields and therefore, likely the highest risk of high variance in initial regression results.
+- [DF1](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/data/reg_model_data_final1.pkl) contains multiple fields for home teams and those same fields for away teams. It has the most fields and therefore, likely the highest risk of high variance in initial regression results.
 
-[DF2](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/data/reg_model_data_final_homeaway.pkl) holds mostly fields representing differential in these stats between home and away teams, foregoing absolute magnitude in favor of relative magnitude.
+- [DF2](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/data/reg_model_data_final_homeaway.pkl) holds mostly fields representing differential in these stats between home and away teams, foregoing absolute magnitude in favor of relative magnitude.
 
-[DF3](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/data/reg_model_data_final3.pkl) is like DF1 in that it contains metrics for both the home and the away team, but I have standardized applicable statistics by the possessions metric, so that most fields represent statistics per possession instead of per game. I also added a squared terms for home and away point spread.
+- [DF3](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/data/reg_model_data_final3.pkl) is like DF1 in that it contains metrics for both the home and the away team, but I have standardized applicable statistics by the possessions metric, so that most fields represent statistics per possession instead of per game. I also added a squared terms for home and away point spread.
 
 Lastly, I created a train-test split between regular season and tournament games. This decision was to ensure that the analysis was truthful to a situation in which one did not know what the results of the tournament would be. I will discuss this decision further in my results section.
 
 ## Exploratory Data Analysis
+All EDA was completed using the
 The following histogram of variables from DF1 demonstrates the distributions of the individual features, as well as of the labels.
-
 ![Histogram plot](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/features_labels_histplot.png)
+Most data is fairly normally distributed across rows (a row being a team up until a matchup within that season). One item of note is that home team point spread and winning percentage are skewed to the left, while away team winning percentage and point spread are skewed to the right. The sample mean for the label I was predicting on (point spread of the actual game) was __3.66__, meaning the home team on average wins by 3.66 points. This is not surprising for the regular season, but it is an issue for prediction in the post-season, when home floor is in name only.
+
+The following scatter matrix of the features on each other (using DF2 home-away aggregated features for sake of space) demonstrates collinear relationships between some of the features.
+![Scatter Matrix](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/features_scatter_matrix.png)
+These include
+
+
 
 |    | Model Variables         |   Model Coefficients |
 |---:|:------------------|---------------:|
