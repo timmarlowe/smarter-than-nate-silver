@@ -180,6 +180,7 @@ The scatterplots of Predicted v. True demonstrate a positive correlation, but no
 
 ## Conclusions and Future Work
 While 70% accuracy may seem high, simply picking the higher seeded team in each game in the 2018 tournament would have yielded an accuracy of 41 out of 67 games or 61%. If we assumed that the 5 games between teams of the same seed are a 50-50 tossup, that is 43.5 games or 65% predicted correctly just from going chalk.
+![Bracket](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/Screen%20Shot%202018-06-29%20at%2012.43.35%20PM.png)
 
 The clear conclusion for this model is that it did not perform well on the desired outcome. Prior to moving forward with other suggested next steps, one should consider completely revamping the dataset. It seems clear now that these aggregate season factors such as strength of schedule, conference strength, and RPI are extremely important. Not all wins (not even all wins with high Effective Field Goal Percentage) are made equal. It would be wise to return to those metrics when further pursuing tournament modeling.
 
