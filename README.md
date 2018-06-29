@@ -44,7 +44,7 @@ df_allstats = games_test.apply(get_season_stats,axis=1)
 
 Next, I attached win-loss record and average point spread up to that point in the season through a similar process.
 
-#### Feature Creation
+## Feature Engineering
 I cleaned up the data and added advanced stats such as [Turnover Percent, Free Throw Factor and Effective Field Goal Percentage](https://www.basketball-reference.com/about/glossary.html) using [feature_eng.py](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/src/feature_eng.py).
 
 ___Turnover percent___:
@@ -89,70 +89,63 @@ Most data is fairly normally distributed across rows (a row being a team up unti
 The following scatter matrix of the features on each other (using DF2 home-away aggregated features for sake of space) demonstrates collinear relationships between some of the features, including between effective field goal percentage and points per game, pace and field goal attempts, points per game and assists per game. ![Scatter Matrix](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/features_scatter_matrix.png)
 While most still seemed to contain some information of their own, I dropped a few, such as field goal percentage, as it was so closely related to effective field goal percentage.
 
-Finally, scatter plots of features on the label demonstrated that a few of our features had promising relationships with point spread. 
-![EFG and Point Spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_efgpct_and_home_point_spread.png) 
+Finally, scatter plots of features on the label demonstrated that a few of our features had promising relationships with point spread.
+![EFG and Point Spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_efgpct_and_home_point_spread.png)
 
-However, others seemed to have little to no relationship to point spread 
-![3-points attempted and Point Spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_3papg_and_home_point_spread.png) 
+However, others seemed to have little to no relationship to point spread
+![3-points attempted and Point Spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_3papg_and_home_point_spread.png)
 
-More can be found in the [images](https://github.com/timmarlowe/smarter-than-nate-silver/tree/master/images) folder.
+More can be found in the [images](https://github.com/timmarlowe/smarter-than-nate-silver/tree/master/images) folder. Further feature engineering is definitely recommended to make this product viable.
 
+## Modeling
+I used three different linear regression models to estimate point spread on each of the databases (OLS, and two regularization models: Lasso and Ridge). Code for modeling can be found in [linear.py](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/src/linear.py).
 
+Each model was created using 10-fold cross-validation on the training data.
 
+For OLS, I used backwards selection to remove coefficients over time. However, likely due to a high bias low variance model to begin with, the removal of features that were not statistically significant created very little change in RMSE.
 
-|    | Model Variables         |   Model Coefficients |
+Similarly, Lasso models for all three dataframes settled on the extremely small coefficients in the range provided, likely because the model is underfit.
+![Lasso Model DF1](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/Lasso_RMSE_vA.png)
+
+Ridge faired no better:
+![Ridge Model DF1]()
+
+In fact, all three models hovered around the exact same RMSE, no matter the dataframe or adjustment to the exogenous variables:
+![RMSE by Model]()
+
+In the end, because regularization and addition of terms were both ineffective at increasing the explanatory power of the model, I chose an OLS model with fewer terms based on the DF3, the per possession database. This model was as follows when trained on the entire training dataset.
+
+|    | Variables         |   Coefficients |
 |---:|:------------------|---------------:|
-|  0 | year              |        -0.0213 |
-|  1 | home_fgp_var      |         0.0024 |
-|  2 | home_ppg_var      |        -0.0051 |
-|  3 | away_fgp_var      |        -0.0128 |
-|  4 | away_ppg_var      |        -0.0063 |
-|  5 | home_ps_home      |         0.29   |
-|  6 | away_ps_away      |         0.2508 |
-|  7 | home_3ppct        |        -0.0428 |
-|  8 | away_3ppct        |         0.0478 |
-|  9 | home_ftpct        |         0.0509 |
-| 10 | away_ftpct        |        -0.0114 |
-| 11 | home_efgpct       |        -0.1863 |
-| 12 | away_efgpct       |         0.2495 |
-| 13 | hometeam_wp       |         0.0512 |
-| 14 | hometeam_homewp   |        -0.0421 |
-| 15 | awayteam_wp       |        -0.042  |
-| 16 | awayteam_awaywp   |         0.0164 |
-| 17 | hometeam_pt_sprd  |        -0.1518 |
-| 18 | hometeam_opp_ppg  |        -0.022  |
-| 19 | awayteam_pt_sprd  |        -0.1398 |
-| 20 | awayteam_opp_ppg  |         0.0497 |
-| 21 | home_pyth_wd      |         0.0459 |
-| 22 | away_pyth_wd      |         0.0006 |
-| 23 | hometeam_ps_var   |         0.0136 |
-| 24 | awayteam_ps_var   |        -0.0052 |
-| 25 | home_tovpct       |        -0.1709 |
-| 26 | away_tovpct       |         0.2696 |
-| 27 | home_ft_factor    |        -0.2454 |
-| 28 | away_ft_factor    |         0.1702 |
-| 29 | home_dreb_perposs |         0.0367 |
-| 30 | away_dreb_perposs |        -0.0306 |
-| 31 | home_oreb_perposs |         0.1397 |
-| 32 | away_oreb_perposs |        -0.2191 |
-| 33 | home_foul_perposs |         0.0224 |
-| 34 | away_foul_perposs |        -0.0187 |
-| 35 | home_p_perposs    |         0.4522 |
-| 36 | away_p_perposs    |        -0.5374 |
-| 37 | home_stl_perposs  |         0.0348 |
-| 38 | away_stl_perposs  |        -0.0356 |
-| 39 | home_3pa_perposs  |         0.0072 |
-| 40 | away_3pa_perposs  |        -0.0023 |
-| 41 | home_fga_perposs  |        -0.3774 |
-| 42 | away_fga_perposs  |         0.5197 |
-| 43 | home_fta_perposs  |         0.0504 |
-| 44 | away_fta_perposs  |         0.0819 |
-| 45 | home_a_perposs    |         0.0267 |
-| 46 | away_a_perposs    |        -0.0174 |
-| 47 | home_b_perposs    |         0.0399 |
-| 48 | away_b_perposs    |        -0.031  |
-| 49 | hpsq              |        -0.0081 |
-| 50 | apsq              |         0.0149 |
+|  0 | home_efgpct       |      -123.072  |
+|  1 | away_efgpct       |        85.1522 |
+|  2 | hometeam_wp       |        11.6049 |
+|  3 | awayteam_wp       |        -9.6597 |
+|  4 | home_tovpct       |       -90.1705 |
+|  5 | away_tovpct       |       156.767  |
+|  6 | home_ft_factor    |       -60.0435 |
+|  7 | away_ft_factor    |        36.0149 |
+|  8 | home_dreb_perposs |        33.9899 |
+|  9 | away_dreb_perposs |       -36.7376 |
+| 10 | home_oreb_perposs |        61.553  |
+| 11 | away_oreb_perposs |       -93.3587 |
+| 12 | home_foul_perposs |        14.5427 |
+| 13 | away_foul_perposs |       -15.0109 |
+| 14 | home_p_perposs    |        95.4668 |
+| 15 | away_p_perposs    |       -71.0021 |
+| 16 | home_stl_perposs  |        50.3138 |
+| 17 | away_stl_perposs  |       -50.2611 |
+| 18 | home_fga_perposs  |      -140.855  |
+| 19 | away_fga_perposs  |       156.897  |
+| 20 | home_fta_perposs  |       -28.0587 |
+| 21 | away_fta_perposs  |        35.862  |
+| 22 | home_a_perposs    |        13.2161 |
+| 23 | away_a_perposs    |        -8.4026 |
+| 24 | home_b_perposs    |        27.5975 |
+| 25 | away_b_perposs    |       -22.3028 |
+
+It is still clearly both over-fit and under-fit.
+
 
 
 |    |   Precision |   Recall |   Accuracy |   Specificity |   False Positive Rate |

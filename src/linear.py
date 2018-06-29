@@ -161,7 +161,7 @@ def regularization_func(exogs, endog, base_estimator, alphas,  title, n_folds=10
             Minmum testing error (float)
             Optimal alpha for minimum testing error (float)
         '''
-    alphas = np.logspace(-6, 1, 20)
+    alphas = alphas
     cv_errors_train, cv_errors_test = train_at_various_alphas(exogs.values, endog, base_estimator, alphas, n_folds=10)
     mean_test_cv_errors = cv_errors_test.mean(axis=0)
     mean_train_cv_errors = cv_errors_train.mean(axis=0)
@@ -187,13 +187,29 @@ def plot_errors_alphas(alphas, opt_alpha, mean_train_errors, mean_test_errors, t
         Returns: Nothing, but saves figure
         '''
     fig, ax = plt.subplots(figsize=(14, 4))
-    ax.plot(np.log10(alphas), mean_train_errors)
-    ax.plot(np.log10(alphas), mean_test_errors)
+    p1 = ax.plot(np.log10(alphas), mean_train_errors, label = "Train")
+    p2 = ax.plot(np.log10(alphas), mean_test_errors, label = "Test")
     ax.axvline(np.log10(opt_alpha), color='grey')
     ax.set_title(title)
     ax.set_xlabel(r"$\log(\alpha)$")
     ax.set_ylabel("RMSE")
+    ax.legend()
     plt.savefig('images/{}.png'.format(title))
+
+def graph_means(ols,lasso,ridge):
+    fig, ax = plt.subplots()
+    N = 3
+    ind = np.arange(N)
+    width = 0.25
+    p1 = ax.bar(ind, ols, width, color='r')
+    p2 = ax.bar(ind+width, lasso, width, color='b')
+    p3 = ax.bar(ind+width*2, ridge, width, color='g')
+    ax.set_title('Min RMSE by Model')
+    ax.set_xticks(ind + width)
+    ax.set_xticklabels(('DF1', 'DF2', 'DF3'))
+    ax.legend((p1[0], p2[0],p3[0]), ('OLS', 'Lasso', 'Ridge'))
+    plt.savefig('images/rmse_mins_by_model.png')
+    plt.close()
 
 if __name__ == "__main__":
     warnings.warn = warn
@@ -268,4 +284,8 @@ if __name__ == "__main__":
     #LR2: Ridge Regression
     ridge_cv_errors_train_c, ridge_cv_errors_test_c, ridge_train_rmse_c, ridge_test_rmse_c, ridge_opt_alpha_c = regularization_func(exogsc0, endogc, Ridge, ridge_alphas,'Ridge_RMSE_vC')
 
-    #CV accuracy rate of top three models (calling the winner)
+    #Graph RMSE of all three models
+    ols_rmse = [ols_test_rmse_a, ols_test_rmse_b, ols_test_rmse_c]
+    lasso_rmse = [lasso_test_rmse_a, lasso_test_rmse_b, lasso_test_rmse_c]
+    ridge_rmse = [ridge_test_rmse_a, ridge_test_rmse_b, ridge_test_rmse_c]
+    graph_means(ols_rmse, lasso_rmse, ridge_rmse)
