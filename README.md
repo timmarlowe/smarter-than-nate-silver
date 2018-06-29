@@ -144,19 +144,37 @@ In the end, because regularization and addition of terms were both ineffective a
 | 24 | home_b_perposs    |        27.5975 |
 | 25 | away_b_perposs    |       -22.3028 |
 
-It is still clearly both over-fit and under-fit.
+It is still clearly both over-fit (see effective field goal percentage) and under-fit.
 
-
+## Results
+At a score threshold of 0, this model has a 69.3% cross validated accuracy. As can be seen in the table below, the model is mostly predicting home teams will win, and extremely underpredicting on away teams.
 
 |    |   Precision |   Recall |   Accuracy |   Specificity |   False Positive Rate |
 |---:|------------:|---------:|-----------:|--------------:|----------------------:|
-| -5 |       0.704 |    0.998 |      0.703 |         0.008 |                 0.992 |
-| -4 |       0.706 |    0.998 |      0.706 |         0.018 |                 0.982 |
-| -3 |       0.706 |    0.992 |      0.704 |         0.023 |                 0.977 |
-| -2 |       0.709 |    0.982 |      0.704 |         0.048 |                 0.952 |
-| -1 |       0.716 |    0.96  |      0.704 |         0.099 |                 0.901 |
-|  0 |       0.718 |    0.927 |      0.693 |         0.142 |                 0.858 |
-|  1 |       0.729 |    0.873 |      0.683 |         0.234 |                 0.766 |
-|  2 |       0.743 |    0.811 |      0.67  |         0.338 |                 0.662 |
-|  3 |       0.757 |    0.712 |      0.637 |         0.459 |                 0.541 |
-|  4 |       0.764 |    0.608 |      0.592 |         0.556 |                 0.444 |
+| -5 |       0.703 |    0.998 |      0.702 |         0.005 |                 0.995 |
+| -4 |       0.705 |    0.998 |      0.705 |         0.013 |                 0.987 |
+| -3 |       0.706 |    0.998 |      0.707 |         0.02  |                 0.98  |
+| -2 |       0.707 |    0.985 |      0.702 |         0.036 |                 0.964 |
+| -1 |       0.709 |    0.973 |      0.701 |         0.058 |                 0.942 |
+|  0 |       0.712 |    0.945 |      0.693 |         0.096 |                 0.904 |
+|  1 |       0.718 |    0.901 |      0.682 |         0.165 |                 0.835 |
+|  2 |       0.729 |    0.825 |      0.662 |         0.277 |                 0.723 |
+|  3 |       0.738 |    0.739 |      0.632 |         0.381 |                 0.619 |
+|  4 |       0.74  |    0.637 |      0.588 |         0.472 |                 0.528 |
+This is likely due to the fact that Away teams in March Madness are different than Away teams in the regular season, in that no one is playing on their home floor.
+
+The ROC curve demonstrates that the model predicts above random chance at all thresholds, but could certainly be improved upon
+![ROC curve]__()__
+
+The final RMSE of the model on the final test data was 11.53 points - an extremely high spread.
+
+## Conclusions and Future Work
+While 70% accuracy may seem high, simply picking the higher seeded team in each game in the 2018 tournament would have yielded an accuracy of __()__%.
+
+The clear conclusion for this model is that it did not perform well on the desired outcome. Prior to moving forward with other suggested next steps, one should consider completely revamping the dataset. It seems clear now that these aggregate season factors such as strength of schedule, conference strength, and RPI are extremely important. Not all wins (not even all wins with high Effective Field Goal Percentage) are made equal. It would be wise to return to those metrics when further pursuing tournament modeling.
+
+However, next steps for any tournament model of this sort would be to:
+- Use bootstrapping to create confidence intervals for the point spread and then assign probabilities to each of the teams winning given those intervals and the predicted point spread.
+- Logistically model on the binary outcome of winning a game.
+- Create a Markov chain framework that would enable you to predict the probability of any team in the field reaching any point in the tournament.
+- If sticking with this dataset, follow the lead of Steve Iannaconne and use non-parametric methods, especially when gauging the effect of how individual players interact with each other on a team.
