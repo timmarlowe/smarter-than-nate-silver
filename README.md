@@ -172,8 +172,14 @@ The ROC curve demonstrates that the model predicts above random chance at all th
 
 The final RMSE of the model on the final test data was __11.53__ points - an extremely high spread.
 
+The scatterplots of Predicted v. True demonstrate a positive correlation, but not one that is predicted with any regularity:
+
+![Scatter 1](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/real_v_predicted2.png)
+
+![Scatter 2](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/real_v_predicted1.png)
+
 ## Conclusions and Future Work
-While 70% accuracy may seem high, simply picking the higher seeded team in each game in the 2018 tournament would have yielded an accuracy of __()__%.
+While 70% accuracy may seem high, simply picking the higher seeded team in each game in the 2018 tournament would have yielded an accuracy of 41 out of 67 games or 61%. If we assumed that the 5 games between teams of the same seed are a 50-50 tossup, that is 43.5 games or 65% predicted correctly just from going chalk.
 
 The clear conclusion for this model is that it did not perform well on the desired outcome. Prior to moving forward with other suggested next steps, one should consider completely revamping the dataset. It seems clear now that these aggregate season factors such as strength of schedule, conference strength, and RPI are extremely important. Not all wins (not even all wins with high Effective Field Goal Percentage) are made equal. It would be wise to return to those metrics when further pursuing tournament modeling.
 
