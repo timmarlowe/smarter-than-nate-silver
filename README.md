@@ -89,7 +89,12 @@ Most data is fairly normally distributed across rows (a row being a team up unti
 The following scatter matrix of the features on each other (using DF2 home-away aggregated features for sake of space) demonstrates collinear relationships between some of the features, including between effective field goal percentage and points per game, pace and field goal attempts, points per game and assists per game. ![Scatter Matrix](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/features_scatter_matrix.png)
 While most still seemed to contain some information of their own, I dropped a few, such as field goal percentage, as it was so closely related to effective field goal percentage.
 
-Finally, scatter plots of features on the label demonstrated that a few of our features had promising relationships with point spread. ![EFG and Point Spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_efgpct_and_home_point_spread.png) ![Turnover % and Point Spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_tovpct_and_home_point_spread.png)However, others seemed to have little to no relationship to point spread ![3-points attempted and Point Spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_3papg_and_home_point_spread.png) ![Offensive Rebounds per game and point spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_orebpg_and_home_point_spread.png)
+Finally, scatter plots of features on the label demonstrated that a few of our features had promising relationships with point spread. ![EFG and Point Spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_efgpct_and_home_point_spread.png) 
+![Turnover % and Point Spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_tovpct_and_home_point_spread.png)
+
+However, others seemed to have little to no relationship to point spread 
+![3-points attempted and Point Spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_3papg_and_home_point_spread.png) 
+![Offensive Rebounds per game and point spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_orebpg_and_home_point_spread.png)
 
 
 
