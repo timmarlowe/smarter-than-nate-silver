@@ -211,6 +211,11 @@ def graph_means(ols,lasso,ridge):
     plt.savefig('images/rmse_mins_by_model.png')
     plt.close()
 
+def scatter_ys(y_final, y_hat):
+    sns_plot = sns.lmplot(x=y_final, y=y_hat, data = df_samp)
+    plt.savefig(r"images/{}_and_home_point_spread.png".format(col))
+    plt.close()
+
 if __name__ == "__main__":
     warnings.warn = warn
 

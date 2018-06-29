@@ -10,6 +10,7 @@ from linear import rmse
 from tabulate import tabulate
 from linear import linear_modeling_test
 import statsmodels.api as sm
+import seaborn as sns
 
 def roc_curve(predictions, labels, thresholds):
     Recall = []
@@ -101,3 +102,13 @@ if __name__ == "__main__":
     thresh2 = np.sort(y_hat_final)
     y_prec2, y_rec2, y_acc2, y_spec2, y_fpr2 = roc_curve(y_hat_final, endog_final, thresh2)
     roc_graph(y_hat_final, endog_final, thresh2, 'Final NCAA Game Prediction Using Pointspread')
+
+    df_final_test['Predicted_Point_Spread'] = y_hat_final
+    df_final_test.rename(index = str, columns={'label_h_point_spread':'Point_Spread_Actual','label_home_winner':'Home_team_winner'}, inplace=True)
+    fig, (ax1, ax2) = plt.subplots(ncols=2, sharey=True)
+    sns.lmplot('Predicted_Point_Spread','Point_Spread_Actual', fit_reg=False, data = df_final_test, hue = 'Home_team_winner')
+    plt.savefig('images/real_v_predicted1.png')
+    plt.close()
+    sns.lmplot('Predicted_Point_Spread','Point_Spread_Actual',  data = df_final_test)
+    plt.savefig('images/real_v_predicted2.png')
+    plt.close()
