@@ -12,7 +12,8 @@ Building models to predict the NCAA tournament is often done by using advanced m
 
 My question was whether I could build a predictor off of a data set that used none of the aggregated metrics to predict point spread and thus outcomes of final four games. Given that there are over 3000 games a season, if a true signal could be found just in the box scores of individual matchups and the aggregation of team stats for each matchup up to that point in the season, it may be a more powerful and specific predictor than a team's advanced stats at the end of the season going into March Madness.
 
-
+## Data Source
+Following Steve's lead, I used data from individual game box scores from the website http://sportsdata.wfmz.com. I aggregated 11 years of this data (from the 2006-2007 season to the 2017-2018 season). In order to do this, I used Steve Iacconne's scrapey.py code (with the exception of a dictionary with the dates of the start of March Madness, this was the only code of his I used).
 
 |    | Model Variables         |   Model Coefficients |
 |---:|:------------------|---------------:|
