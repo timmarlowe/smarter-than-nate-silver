@@ -5,6 +5,7 @@
 _Data and original idea thanks to Steve Iannaccone, whose project "Smarter Than Nate Silver" was the original fork for this repo_
 
 ![Kris Jenkins hits a buzzer beater](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/kris-jenkins-villanova-buzzer-beat-shot-4516-getty-ftrjpg_fxtkh1vphf341td70sn7qpiql.jpg)
+Photo Credit: [The Sporting News](http://www.sportingnews.com/ncaa-basketball/news/ncaa-tournament-greatest-games-duke-kentucky-north-carolina-unc-villanova-georgetown/3za49mgurf091mjxj0j7abz0t)
 
 ## Problem Statement:
 Building models to predict the NCAA tournament is often done by using advanced metrics of team success over the course of the season. These include metrics like
@@ -15,7 +16,11 @@ My question was whether I could build a predictor off of a data set that used no
 ## Data Source
 Following Steve's lead, I used data from individual game box scores from the website http://sportsdata.wfmz.com. I aggregated 11 years of this data (from the 2006-2007 season to the 2017-2018 season). In order to do this, I used Steve Iacconne's [scrapey.py](https://github.com/timmarlowe/smarter-than-nate-silver/edit/master/src/scrapey.py) code. With the exception of a dictionary with the dates of the start of March Madness, this was the only code of his I used).
 
-Upon compiling the data, I was left with a data set of 1.3 million rows, in which each row was a player's individual stat-line in a game. I aggregated up to the matchup and then game level using groupby, and then used the following code to aggregate a team's stats (mean and variance) up to the game in question and merge that data with my games result database:
+Upon compiling the data, I was left with a data set of 1.3 million rows, in which each row was a player's individual stat-line in a game. I aggregated up to the matchup and then game level using groupby. Then given that I wanted to predict on record up to a certain game, the task was to aggregate the stats of each team up to that game. In the example below, in order to predict Louisville's outcome agains VA Tech, I needed their team stats up until VA Tech.
+
+![Louisville Schedule](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/Louisville%20Cardinals%20Schedule.png)
+
+I created the following code in [data_agg_clean.py](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/src/data_agg_clean.py) to aggregate a team's stats (mean and variance) up to the game in question and merge that data with my games result database (games_test):
 ```python
 def get_season_stats(row):
     #Create Home df
@@ -36,7 +41,47 @@ def get_season_stats(row):
 df_allstats = games_test.apply(get_season_stats,axis=1)
     ```
 
-Next, I attached win-loss record and average point spread up to that point in the season through a similar process. Then I cleaned up the data
+Next, I attached win-loss record and average point spread up to that point in the season through a similar process.
+
+I cleaned up the data and added advanced stats such as [Turnover Percent, Free Throw Factor and Effective Field Goal Percentage](https://www.basketball-reference.com/about/glossary.html) using [feature_eng.py](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/src/feature_eng.py).
+
+__Turnover percent__:
+```python
+df['home_tovpct'] = df['home_topg']/(df['home_fgapg'] + 0.44 * df['home_ftapg'] + df['home_topg'])
+```
+__Free Throw Factor__:
+```python
+df['home_ft_factor'] = df['home_ftmpg']/df['home_fgapg']
+```
+__Effective Field Goal Percent__:
+```python
+df['home_efgpct'] = (df['home_fgmpg']+.5*df['home_3pmpg'])/df['home_fgapg']
+```
+I also included an amateur calculation of __number of possessions__ in a game as a pace metric:
+```python
+df['home_pace'] =  df['home_fgapg'] - df['home_orebpg'] + df['home_topg']
+```
+And a calculation of the __pythagorean expectation__ for difference between games won and expected games won each team:
+```python
+df['home_pyth_wd'] = df['hometeam_wins'] - df['hometeam_games'] * (df['home_ppg']**14)/((df['home_ppg']**14)+(df['hometeam_opp_ppg']**14))
+```
+
+Unfortunately, because of the method of aggregation and lack of data from the box scores, I was not able to calculate most defensive statistics.
+
+As a last step prior to train-test-split, I created three dataframes, each one with its own approach to the data.
+
+[DF1](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/data/reg_model_data_final1.pkl) contains multiple fields for home teams and those same fields for away teams. It has the most fields and therefore, likely the highest risk of high variance in initial regression results.
+
+[DF2](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/data/reg_model_data_final_homeaway.pkl) holds mostly fields representing differential in these stats between home and away teams, foregoing absolute magnitude in favor of relative magnitude.
+
+[DF3](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/data/reg_model_data_final3.pkl) is like DF1 in that it contains metrics for both the home and the away team, but I have standardized applicable statistics by the possessions metric, so that most fields represent statistics per possession instead of per game. I also added a squared terms for home and away point spread.
+
+Lastly, I created a train-test split between regular season and tournament games. This decision was to ensure that the analysis was truthful to a situation in which one did not know what the results of the tournament would be. I will discuss this decision further in my results section.
+
+## Exploratory Data Analysis
+The following histogram of variables from DF1 demonstrates the distributions of the individual features, as well as of the labels.
+
+![Histogram plot](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/features_labels_histplot.png)
 
 |    | Model Variables         |   Model Coefficients |
 |---:|:------------------|---------------:|
