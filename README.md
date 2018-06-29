@@ -83,13 +83,14 @@ Lastly, I created a train-test split between regular season and tournament games
 
 ## Exploratory Data Analysis
 All EDA was completed using the
-The following histogram of variables from DF1 demonstrates the distributions of the individual features, as well as of the labels.
-![Histogram plot](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/features_labels_histplot.png)
+The following histogram of variables from DF1 demonstrates the distributions of the individual features, as well as of the labels.![Histogram plot](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/features_labels_histplot.png)
 Most data is fairly normally distributed across rows (a row being a team up until a matchup within that season). One item of note is that home team point spread and winning percentage are skewed to the left, while away team winning percentage and point spread are skewed to the right. The sample mean for the label I was predicting on (point spread of the actual game) was __3.66__, meaning the home team on average wins by 3.66 points. This is not surprising for the regular season, but it is an issue for prediction in the post-season, when home floor is in name only.
 
-The following scatter matrix of the features on each other (using DF2 home-away aggregated features for sake of space) demonstrates collinear relationships between some of the features.
-![Scatter Matrix](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/features_scatter_matrix.png)
-These include
+The following scatter matrix of the features on each other (using DF2 home-away aggregated features for sake of space) demonstrates collinear relationships between some of the features, including between effective field goal percentage and points per game, pace and field goal attempts, points per game and assists per game. ![Scatter Matrix](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/features_scatter_matrix.png)
+While most still seemed to contain some information of their own, I dropped a few, such as field goal percentage, as it was so closely related to effective field goal percentage.
+
+Finally, scatter plots of features on the label demonstrated that a few of our features had promising relationships with point spread. ![EFG and Point Spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_efgpct_and_home_point_spread.png) ![Turnover % and Point Spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_tovpct_and_home_point_spread.png)However, others seemed to have little to no relationship to point spread ![3-points attempted and Point Spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_3papg_and_home_point_spread.png) ![Offensive Rebounds per game and point spread](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/diff_orebpg_and_home_point_spread.png)
+
 
 
 
