@@ -205,7 +205,7 @@ if __name__ == "__main__":
     #Linear Modeling - OLS regressions
     df_orig = pd.read_pickle('data/reg_model_data_final1.pkl')
     endoga = df_orig['label_h_point_spread'].values
-    exogsa0 = df_orig.drop(['label_h_point_spread','label_home_winner'],axis=1)
+    exogsa0 = df_orig.drop(['label_h_point_spread','label_home_winner','home_fgpct','away_fgpct'],axis=1)
     exogsa1 = df_orig.drop(['label_h_point_spread','label_home_winner','home_ppg','home_fgapg','home_ftapg','home_ftpct','home_fgp_var','home_ppg_var','away_ftapg','away_ppg_var','away_3ppct','away_ftpct','awayteam_awaywp','hometeam_opp_ppg','away_pyth_wd','awayteam_ps_var','home_pace','away_pace'],axis=1)
     exogsa2 = df_orig.drop(['label_h_point_spread','label_home_winner','home_ppg','home_fgapg','home_ftapg','home_ftpct','home_fgp_var','home_ppg_var','away_ftapg','away_ppg_var','away_3ppct','away_ftpct','awayteam_awaywp','hometeam_opp_ppg','away_pyth_wd','awayteam_ps_var','home_pace','away_pace','home_drebpg','home_fgpct','away_fgpct','home_3ppct','awayteam_opp_ppg'],axis=1)
     exogsa3 = df_orig.drop(['label_h_point_spread','label_home_winner','home_ppg','home_fgapg','home_ftapg','home_ftpct','home_fgp_var','home_ppg_var','away_ftapg','away_ppg_var','away_3ppct','away_ftpct','awayteam_awaywp','hometeam_opp_ppg','away_pyth_wd','awayteam_ps_var','home_pace','away_pace','home_drebpg','home_fgpct','away_fgpct','home_3ppct','awayteam_opp_ppg','home_foulpg','home_3papg','away_3papg','home_stlpg'],axis=1)
@@ -243,7 +243,7 @@ if __name__ == "__main__":
     #Linear Modeling - OLS regressions
     df_3 = pd.read_pickle('data/reg_model_data_final3.pkl')
     endogc = df_3['label_h_point_spread'].values
-    exogsc0 = df_3.drop(['label_h_point_spread','label_home_winner','home_fgpct','away_fgpct','home_3ppct','away_3ppct'],axis=1)
+    exogsc0 = df_3.drop(['label_h_point_spread','label_home_winner','home_fgpct','away_fgpct'],axis=1)
     exogsc1 = df_3.drop(['label_h_point_spread','label_home_winner','year','home_fgp_var','home_ppg_var',
                         'away_fgp_var','away_ppg_var','home_ps_home','away_ps_away',
                         'home_fgpct','away_fgpct','home_3ppct','away_3ppct',
