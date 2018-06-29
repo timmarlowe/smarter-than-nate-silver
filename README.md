@@ -2,7 +2,9 @@
 ### Predicting the NCAA Tournament Using Team Boxscore Data
 ##### Tim Marlowe -- Date of Last Update: 6/28/2018
 
-Data and original idea thanks to Steve Iannaccone, whose project "Smarter Than Nate Silver" was the original fork for this repo
+_Data and original idea thanks to Steve Iannaccone, whose project "Smarter Than Nate Silver" was the original fork for this repo_
+
+![Kris Jenkins hits a buzzer beater](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/kris-jenkins-villanova-buzzer-beat-shot-4516-getty-ftrjpg_fxtkh1vphf341td70sn7qpiql.jpg)
 
 ## Problem Statement:
 Building models to predict the NCAA tournament is often done by using advanced metrics of team success over the course of the season. These include metrics like
