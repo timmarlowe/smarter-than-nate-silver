@@ -13,7 +13,30 @@ Building models to predict the NCAA tournament is often done by using advanced m
 My question was whether I could build a predictor off of a data set that used none of the aggregated metrics to predict point spread and thus outcomes of final four games. Given that there are over 3000 games a season, if a true signal could be found just in the box scores of individual matchups and the aggregation of team stats for each matchup up to that point in the season, it may be a more powerful and specific predictor than a team's advanced stats at the end of the season going into March Madness.
 
 ## Data Source
-Following Steve's lead, I used data from individual game box scores from the website http://sportsdata.wfmz.com. I aggregated 11 years of this data (from the 2006-2007 season to the 2017-2018 season). In order to do this, I used Steve Iacconne's scrapey.py code (with the exception of a dictionary with the dates of the start of March Madness, this was the only code of his I used).
+Following Steve's lead, I used data from individual game box scores from the website http://sportsdata.wfmz.com. I aggregated 11 years of this data (from the 2006-2007 season to the 2017-2018 season). In order to do this, I used Steve Iacconne's [scrapey.py](https://github.com/timmarlowe/smarter-than-nate-silver/edit/master/src/scrapey.py) code. With the exception of a dictionary with the dates of the start of March Madness, this was the only code of his I used).
+
+Upon compiling the data, I was left with a data set of 1.3 million rows, in which each row was a player's individual stat-line in a game. I aggregated up to the matchup and then game level using groupby, and then used the following code to aggregate a team's stats (mean and variance) up to the game in question and merge that data with my games result database:
+```python
+def get_season_stats(row):
+    #Create Home df
+    df = game_stats[(game_stats['year'] == row.year) & (game_stats['DATE']<row.DATE) & (game_stats['TEAM']==row.Home)]
+    #pdb.set_trace()
+    dfmean_home = df.loc[:, ['BLK','DEF_REB','OFF_REB','TOT_REB','PF','PTS','STL','TO','3PM','3PA','FGM','FGA','FTM','FTA','A']].mean(axis=0)
+    dfvar_home = df.loc[:,['FGP','PTS']].var(axis=0)
+    df_home = pd.concat([dfmean_home,dfvar_home])
+    #Create Away df
+    df2 = game_stats[(game_stats['year'] == row.year) & (game_stats['DATE']<row.DATE) & (game_stats['TEAM']==row.Away)]
+    dfmean_away = df2.loc[:, ['BLK','DEF_REB','OFF_REB','TOT_REB','PF','PTS','STL','TO','3PM','3PA','FGM','FGA','FTM','FTA','A']].mean(axis=0)
+    dfvar_away = df2.loc[:,['FGP','PTS']].var(axis=0)
+    df_away = pd.concat([dfmean_away,dfvar_away])
+    #concatenate the two
+    df_all = pd.concat([df_home, df_away])
+    return df_all
+
+df_allstats = games_test.apply(get_season_stats,axis=1)
+    ```
+
+Next, I attached win-loss record and average point spread up to that point in the season through a similar process. Then I cleaned up the data
 
 |    | Model Variables         |   Model Coefficients |
 |---:|:------------------|---------------:|
