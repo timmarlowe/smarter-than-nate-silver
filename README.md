@@ -178,3 +178,8 @@ However, next steps for any tournament model of this sort would be to:
 - Logistically model on the binary outcome of winning a game.
 - Create a Markov chain framework that would enable you to predict the probability of any team in the field reaching any point in the tournament.
 - If sticking with this dataset, follow the lead of Steve Iannaconne and use non-parametric methods, especially when gauging the effect of how individual players interact with each other on a team.
+
+## Citations and Thanks
+- Many thanks to Steve Iannaccone for initiating this repo and having this idea before I did. Hopefully he was able to execute it slightly better using neural networks.
+- Thanks to the galvanize staff and solutions repo, for access to many snippets of code that I adapted here for my own purposes.
+- All data was accessed from 
