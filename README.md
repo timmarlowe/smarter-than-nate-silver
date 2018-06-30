@@ -111,10 +111,11 @@ Similarly, Lasso models for all three dataframes settled on small coefficients i
 ![Lasso Model DF1](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/Lasso_RMSE_vA.png)
 
 Ridge faired no better:
-![Ridge Model DF1]()
+
+![Ridge by Alpha](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/Ridge_RMSE_vA.png)
 
 In fact, all three models hovered around the exact same RMSE, no matter the dataframe or adjustment to the exogenous variables:
-![RMSE by Model](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/Ridge_RMSE_vA.png)
+![RMSE by Model](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/rmse_mins_by_model.png)
 
 Because regularization and addition of terms were both ineffective at increasing the explanatory power of the model, I chose an OLS model with fewer terms based on the per possession database (DF3). The coefficients for the model are as follows:
 
@@ -180,7 +181,7 @@ The scatterplots of Predicted v. True demonstrate a positive correlation, but no
 ![Scatter 2](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/real_v_predicted1.png)
 
 ## Conclusions and Future Work
-While 70% accuracy may seem high, simply picking the higher seeded team in each game in the 2018 tournament would have yielded an accuracy of 43 out of 67 games or 64%. If we assumed that the 5 games between teams of the same seed are a 50-50 tossup, that is 45.5 games or 68% predicted correctly just from going chalk.
+While 69% accuracy may seem high, simply picking the higher seeded team in each game in the 2018 tournament would have yielded an accuracy of 43 out of 67 games or 64%. If we assumed that the 5 games between teams of the same seed are a 50-50 tossup, that is 45.5 games or 68% predicted correctly just from going chalk.
 ![Bracket](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/Screen%20Shot%202018-06-29%20at%2012.43.35%20PM.png)
 
 The clear conclusion for this model is that it did not perform well on the desired outcome. Prior to moving forward with other suggested next steps, one should consider completely revamping the dataset. It seems clear now that these aggregate season factors such as strength of schedule, conference strength, and RPI are extremely important. Not all wins (not even all wins with high Effective Field Goal Percentage) are made equal. It would be wise to return to those metrics when further pursuing tournament modeling.
