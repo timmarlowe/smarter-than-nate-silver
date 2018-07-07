@@ -107,7 +107,7 @@ I've used three different linear models to estimate point spread on each of the 
 
 For OLS, I used backwards selection to remove coefficients over time. However, likely due to a high bias, low variance model to begin with, the removal of features that were not statistically significant created very little change in RMSE.
 
-Similarly, Lasso models for all three dataframes settled on small alphass in the range provided, likely because the model is underfit.
+Similarly, Lasso models for all three dataframes settled on small alphas in the range provided, likely because the model is underfit.
 
 ![Lasso Model DF1](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/Lasso_RMSE_vA.png)
 
