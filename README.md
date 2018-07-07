@@ -17,7 +17,7 @@ My question was whether I could build a predictor off of a data set that used no
 #### Aggregation Methods
 Following Steve's lead, I used data from individual game box scores from the website http://sportsdata.wfmz.com. I aggregated 11 years of this data (from the 2006-2007 season to the 2017-2018 season). In order to do this, I used Steve Iacconne's [scrapey.py](https://github.com/timmarlowe/smarter-than-nate-silver/edit/master/src/scrapey.py) code.
 
-This resulted in a data set of 1.3 million rows, in which each row was a player's individual stat-line in a game. I aggregated up to the matchup (2 rows per game) and then game level (1 row per game) using groupby. Then given that I wanted to predict on record up to a certain game, I aggregated the stats of each team in the matchup up to that game. In the example below, in order to predict Louisville's outcome agains VA Tech, I needed their team stats up until VA Tech.
+This resulted in a data set of 1.3 million rows, in which each row was a player's individual stat-line in a game. I aggregated up to the matchup (2 rows per game) and then game level (1 row per game) using groupby. Then given that I wanted to predict on record up to a certain game, I aggregated the stats of each team in the matchup up to that game. In the example below, in order to predict Louisville's outcome agains VA Tech, I needed their team stats up until VA Tech, meaning that every previous game went into my aggregation, but no games afterward.
 
 ![Louisville Schedule](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/Louisville%20Cardinals%20Schedule.png)
 
@@ -107,7 +107,8 @@ I've used three different linear models to estimate point spread on each of the 
 
 For OLS, I used backwards selection to remove coefficients over time. However, likely due to a high bias, low variance model to begin with, the removal of features that were not statistically significant created very little change in RMSE.
 
-Similarly, Lasso models for all three dataframes settled on small coefficients in the range provided, likely because the model is underfit.
+Similarly, Lasso models for all three dataframes settled on small alphass in the range provided, likely because the model is underfit.
+
 ![Lasso Model DF1](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/Lasso_RMSE_vA.png)
 
 Ridge faired no better:
@@ -115,6 +116,7 @@ Ridge faired no better:
 ![Ridge by Alpha](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/Ridge_RMSE_vA.png)
 
 In fact, all three models hovered around the exact same RMSE, no matter the dataframe or adjustment to the exogenous variables:
+
 ![RMSE by Model](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/rmse_mins_by_model.png)
 
 Because regularization and addition of terms were both ineffective at increasing the explanatory power of the model, I chose an OLS model with fewer terms based on the per possession database (DF3). The coefficients for the model are as follows:
@@ -148,7 +150,7 @@ Because regularization and addition of terms were both ineffective at increasing
         | 24 | home_b_perposs    |        27.5975 |
         | 25 | away_b_perposs    |       -22.3028 |
 
-It is still clearly both over-fit (see effective field goal percentage) and under-fit.
+It is still clearly both over-fit with multiple collinear variables (see effective field goal percentage and points per possession) and under-fit. While the collinearity may not be as much of an issue for prediction, it makes for a messier model and uninformative coefficients.
 
 ## Results
 At a score threshold of 0 point spread between home and away, this model has a 69.3% accuracy when tested on the hold-out tournament data. As can be seen in the table below, the model is mostly predicting home teams will win, and extremely underpredicting on away teams.
@@ -172,7 +174,7 @@ The ROC curve demonstrates that the model predicts above random chance at all th
 
 ![ROC curve](https://github.com/timmarlowe/smarter-than-nate-silver/blob/master/images/ROC%20of%20Final%20NCAA%20Game%20Prediction%20Using%20Pointspread.png)
 
-The final RMSE of the model on the final test data was __11.53__ points - an extremely high spread.
+The final RMSE of the model on the final test data was __11.53__ points - an extremely high spread - almost high enough as to be uninformative for any one game.
 
 The scatterplots of Predicted v. True demonstrate a positive correlation, but not one that is predicted with any regularity:
 
@@ -193,6 +195,6 @@ However, next steps for any tournament model of this sort would be to:
 - If sticking with this dataset, follow the lead of Steve Iannaconne and use non-parametric methods, especially when gauging the effect of how individual players interact with each other on a team.
 
 ## Citations and Thanks
-- Many thanks to Steve Iannaccone for initiating this repo and having this idea before I did. Hopefully he was able to execute it slightly better using neural networks.
-- Thanks to the galvanize staff and solutions repo, for access to many snippets of code that I adapted here for my own purposes.
+- Many thanks to Steve Iannaccone for initiating this repo and having this idea before I did. Hopefully he was able to execute it slightly better using neural networks. Steve was also the provider of the scrapey.py code.
+- While Thanks to the galvanize staff and solutions repo, for access to many snippets of code that I adapted here for my own purposes.
 - All data was accessed from http://sportsdata.wfmz.com
